@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MemeAI · 情感表情包生成器</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- 顶栏 -->
+  <header class="topbar">
+    <div class="logo">
+      <div class="logo-text">🎭 Meme<em>AI</em></div>
+      <div class="logo-badge">BETA</div>
+    </div>
+    <div class="topbar-r">
+      <div class="chip">CLIP ViT-B/32</div>
+      <div class="chip">CrossModalMLP</div>
+      <div class="chip">80.12% ACC</div>
+      <button class="theme-toggle" @click="toggleTheme">
+        <span v-if="isDark">☀️</span>
+        <span v-else>🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="body">
+
+    <!-- ════ 左栏 ════ -->
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+
+        <!-- Step 1 -->
+        <div class="step-block">
+          <div class="step-head">
+            <div class="step-num" :class="{done:!!preview}">{{preview?'✓':'1'}}</div>上传图片
+          </div>
+          <div v-if="!preview" class="upload-zone" :class="{drag:isDrag}"
+               @dragover.prevent="isDrag=true" @dragleave="isDrag=false" @drop.prevent="onDrop">
+            <input type="file" accept="image/*" @change="onFile">
+            <div class="upload-inner">
+              <div class="upload-ico">🖼️</div>
+              <div class="upload-hint">拖拽或<strong>点击上传</strong><br>JPG · PNG · JPEG</div>
+            </div>
+          </div>
+          <div v-else class="thumb-wrap">
+            <img :src="'data:image/'+previewExt+';base64,'+preview" class="thumb">
+            <button class="btn-sm mt1" style="width:100%;" @click="reset">↩ 重新上传</button>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Step 2 -->
+        <div class="step-block">
+          <div class="step-head">
+            <div class="step-num" :class="{done:!!emotion}">2</div>补充描述（可选）
+          </div>
+          <textarea class="field" rows="2" placeholder="图片情绪不明显时补充..." v-model="userText"></textarea>
+          <div class="mt2">
+            <button class="btn-secondary" @click="predict" :disabled="!file||loading.predict">
+              <span v-if="loading.predict"><i class="spin" style="border-top-color:var(--accent);border-color:rgba(225,29,72,.2)"></i>识别中...</span>
+              <span v-else>{{ emotion ? '🔄 重新识别' : '🧠 识别情绪' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Step 3 -->
+        <div class="step-block" v-if="emotion">
+          <div class="step-head">
+            <div class="step-num" :class="{done:!!gifB64}">3</div>选择文案
+          </div>
+          <div class="pills">
+            <div class="pill" :class="{on:textMode==='pick'}"   @click="textMode='pick'">推荐</div>
+            <div class="pill" :class="{on:textMode==='custom'}" @click="textMode='custom'">自定义</div>
+            <div class="pill" :class="{on:textMode==='none'}"   @click="textMode='none'">无文案</div>
+          </div>
+          <div v-if="textMode==='pick'" class="text-row">
+            <select class="field" v-model="selectedText">
+              <option v-for="t in textBatch" :key="t">{{t}}</option>
+            </select>
+            <button class="btn-sm" @click="nextBatch">↻</button>
+          </div>
+          <div v-else-if="textMode==='custom'">
+            <input class="field" type="text" v-model="customText" placeholder="输入文案...">
+          </div>
+          <div v-else style="font-size:.72rem;color:var(--text3);padding:.3rem 0;">生成 GIF 不含文字</div>
+        </div>
+
+        <!-- Step 3 提示（未识别时） -->
+        <div v-if="!emotion" class="step-block">
+          <div class="step-head">
+            <div class="step-num" style="background:var(--bg);color:var(--text3);border:1px solid var(--border);">3</div>选择文案
+          </div>
+          <div style="font-size:.76rem;color:var(--text3);background:var(--bg);border-radius:9px;padding:.8rem 1rem;line-height:1.7;">
+            先完成情绪识别<br>文案选项将在这里出现
+          </div>
+        </div>
+
+      </div><!-- /sidebar-scroll -->
+
+      <!-- 固定底部生成按钮 -->
+      <div class="sidebar-foot">
+        <button class="btn-primary" @click="generate" :disabled="!emotion||loading.gen">
+          <span v-if="loading.gen"><i class="spin"></i>生成中...</span>
+          <span v-else>🚀 生成动态表情包</span>
+        </button>
+        <div v-if="loading.gen" class="gen-progress" style="margin-top:.5rem;">
+          <div class="gen-progress-bar" :style="{width: genProgress+'%'}"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ════ 主画布 ════ -->
+    <main class="canvas">
+      <div class="tabs">
+        <button class="tab" :class="{on:tab==='result'}"  @click="tab='result'">✨ 工作台</button>
+        <button class="tab" :class="{on:tab==='history'}" @click="tab='history'">📋 历史 {{history.length?'('+history.length+')':''}}</button>
+        <button class="tab" :class="{on:tab==='info'}"    @click="tab='info'">📊 系统介绍</button>
+      </div>
+
+      <!-- 工作台 -->
+      <div v-show="tab==='result'">
+        <div v-if="!emotion" class="empty-canvas">
+          <div class="empty-emoji">🎭</div>
+          <div class="empty-title">上传图片，开始创作</div>
+          <div class="empty-sub">在左侧上传一张图片并点击识别<br>AI 将自动分析情绪并生成动态表情包</div>
+        </div>
+        <div v-else>
+          <!-- 情绪英雄卡 -->
+          <div class="emotion-hero fade-up animate" :data-emotion="emotion"
+               :style="{background:'linear-gradient(135deg,'+emotionBg+',white)',borderColor:emotionColor+'40'}">
+            <div class="hero-icon">{{emotionIcon}}</div>
+            <div class="hero-body">
+              <div class="hero-eyebrow">DETECTED EMOTION</div>
+              <div class="hero-name" :style="{color:emotionColor}">{{emotion}}</div>
+              <div class="hero-sub">CLIP ViT-B/32 · CrossModalMLP · ACC 80.12%</div>
+            </div>
+            <div class="hero-right">
+              <div class="hero-pct" :style="{color:emotionColor}">{{topProb}}%</div>
+              <div class="hero-pct-label">置信度</div>
+            </div>
+          </div>
+
+          <!-- 置信度 + 手动修正 并排 -->
+          <div class="info-row-2">
+            <div class="conf-card">
+              <div class="sec-label">置信度分布</div>
+              <div v-for="(prob,emo) in probs" :key="emo" class="conf-row">
+                <div class="conf-lbl" :class="{top:emo===emotion}">{{ICONS[emo]}} {{emo}}</div>
+                <div class="conf-track">
+                  <div class="conf-bar" :style="{width:(prob*100).toFixed(0)+'%',background:COLORS[emo],opacity:emo===emotion?1:0.3}"></div>
+                </div>
+                <div class="conf-pct" :class="{top:emo===emotion}">{{(prob*100).toFixed(1)}}%</div>
+              </div>
+            </div>
+            <div class="correct-card">
+              <div class="sec-label">手动修正</div>
+              <div v-if="emotion==='未知'" class="unknown-hint">
+                ⚠️ 置信度不足，建议手动选择正确情绪
+              </div>
+              <select class="field" :class="{'field-warn': emotion==='未知'}" v-model="emotion">
+                <option v-for="e in allEmotions" :key="e">{{e}}</option>
+              </select>
+              <div style="margin-top:.6rem;font-size:.72rem;color:var(--text3);line-height:1.6;">
+                <span v-if="emotion!=='未知'">AI识别有误时<br>可在此手动选择正确情绪</span>
+                <span v-else style="color:var(--accent);">选择情绪后即可生成 GIF</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GIF结果 -->
+          <div v-if="gifB64" class="result-card">
+            <div class="sec-label">生成结果</div>
+            <div class="result-grid">
+              <div class="gif-wrap" :style="{borderColor:emotionColor+'40'}">
+                <img :src="'data:image/gif;base64,'+gifB64" :key="gifKey">
+                <div class="gif-footer">
+                  <span class="gif-emo" :style="{color:emotionColor}">{{emotionIcon}} {{emotion}}</span>
+                  <span class="gif-tag">30帧 · GIF · 40ms</span>
+                </div>
+              </div>
+              <div class="gif-meta">
+                <div>
+                  <div class="meta-lbl">识别情绪</div>
+                  <div class="meta-val-lg" :style="{color:emotionColor}">{{emotionIcon}} {{emotion}}</div>
+                </div>
+                <div>
+                  <div class="meta-lbl">使用文案</div>
+                  <div class="meta-val">{{finalText||'（无文案）'}}</div>
+                </div>
+                <div>
+                  <div class="meta-lbl">生成参数</div>
+                  <div class="meta-val">30帧 · 40ms/帧 · 无限循环 · PIL+imageio</div>
+                </div>
+                <div class="result-actions">
+                  <a class="btn-dl" :href="'data:image/gif;base64,'+gifB64" :download="'meme_'+emotion+'_'+Date.now()+'.gif'">💾 下载表情包</a>
+                  <button class="btn-ghost" @click="gifB64=null">🔁 重新生成</button>
+                  <button class="btn-ghost" @click="reset">🗑️ 清空重来</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 历史 -->
+      <div v-show="tab==='history'">
+        <div v-if="!history.length" class="empty">
+          <div class="eico">📭</div>
+          <div class="etxt">还没有生成记录<br>去生成第一个表情包吧</div>
+        </div>
+        <div v-else>
+          <div class="hist-bar">
+            <span style="font-size:.78rem;color:var(--text2);font-weight:600;">共 {{history.length}} 条记录</span>
+            <button class="btn-sm" @click="history=[]">清空</button>
+          </div>
+          <div class="hist-grid">
+            <div v-for="(r,i) in history" :key="i" class="hcard">
+              <img :src="'data:image/gif;base64,'+r.gif">
+              <div class="hcard-info">
+                <div class="hcard-emo" :style="{color:r.color}">{{r.icon}} {{r.emotion}}</div>
+                <div class="hcard-txt">{{r.text||'（无文案）'}}</div>
+                <div class="hcard-ts">{{r.ts}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 系统介绍 -->
+      <div v-show="tab==='info'">
+        <div class="stat-row">
+          <div class="scard" v-for="s in stats" :key="s.label">
+            <div class="scard-val">{{s.val}}</div>
+            <div class="scard-lbl">{{s.label}}</div>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="icard">
+            <div class="icard-title">各类别 F1-score</div>
+            <div v-for="f in f1data" :key="f.emo" class="conf-row" style="margin-bottom:9px;">
+              <div class="conf-lbl top">{{f.ico}} {{f.emo}}</div>
+              <div class="conf-track"><div class="conf-bar" :style="{width:(f.f1*100)+'%',background:f.c,opacity:.85}"></div></div>
+              <div class="conf-pct top">{{f.f1.toFixed(2)}}</div>
+            </div>
+            <div style="margin-top:1.2rem;">
+              <div class="icard-title">消融实验对比</div>
+              <table>
+                <tr><th>模型</th><th>数据量</th><th>准确率</th></tr>
+                <tr><td>单模态 MLP（图像）</td><td>3,000</td><td>76.5%</td></tr>
+                <tr><td>跨模态 MLP（图文）</td><td>3,000</td><td>76.3%</td></tr>
+                <tr class="best"><td>跨模态 MLP（图文）★ 5类</td><td>12,743</td><td>80.12%</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="icard">
+            <div class="icard-title">技术架构</div>
+            <div class="tech-row" v-for="t in techStack" :key="t.l">
+              <span class="tech-l">{{t.l}}</span>
+              <span class="tech-v">{{t.i}}</span>
+            </div>
+            <div style="margin-top:1.2rem;">
+              <div class="icard-title">端到端流程</div>
+              <div class="flow">
+                <span class="fstep">上传图片</span><span class="farr">→</span>
+                <span class="fstep">CLIP提取特征</span><span class="farr">→</span>
+                <span class="fstep">MLP分类</span><span class="farr">→</span>
+                <span class="fstep">匹配文案</span><span class="farr">→</span>
+                <span class="fstep end">生成GIF</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+<div id="toast-container"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
