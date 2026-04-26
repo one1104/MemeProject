@@ -19,7 +19,7 @@
 | CLIP Linear Probe（图像 only） | 73.44% | 69.44% |
 | **本文方法（CrossModalMLP）** | **85.29%** | **75.85%** |
 
-详细指标、错误分析与论文表述建议见 [`PAPER_STATS.md`](PAPER_STATS.md)。
+详细指标、错误分析与论文表述建议见 [`paper/PAPER_STATS.md`](paper/PAPER_STATS.md)。
 
 ## 功能
 
