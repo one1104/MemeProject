@@ -1,0 +1,300 @@
+{
+  "generated_at": "2026-04-19 18:18:32",
+  "subsets": {
+    "val": {
+      "name": "seed=42 验证集",
+      "n": 2549
+    },
+    "held_out": {
+      "name": "MD5 清洗后独立测试集",
+      "n": 1201
+    }
+  },
+  "label_names": [
+    "尴尬",
+    "开心",
+    "悲伤",
+    "惊讶",
+    "愤怒"
+  ],
+  "baselines": {
+    "random": {
+      "note": "理论随机基线 = 1/num_classes",
+      "val": {
+        "accuracy": 0.2
+      },
+      "held_out": {
+        "accuracy": 0.2
+      }
+    },
+    "clip_zero_shot_zh": {
+      "backbone": "ViT-B/32",
+      "prompt_templates": [
+        "一张表达{}情绪的表情包",
+        "{}的表情包",
+        "一个看起来{}的人",
+        "表达{}的图片",
+        "显得很{}"
+      ],
+      "prompt_ensemble": true,
+      "val": {
+        "accuracy": 0.1781,
+        "correct": 454,
+        "total": 2549,
+        "per_class_accuracy": {
+          "尴尬": {
+            "correct": 231,
+            "total": 515,
+            "accuracy": 0.4485
+          },
+          "开心": {
+            "correct": 22,
+            "total": 434,
+            "accuracy": 0.0507
+          },
+          "悲伤": {
+            "correct": 181,
+            "total": 453,
+            "accuracy": 0.3996
+          },
+          "惊讶": {
+            "correct": 2,
+            "total": 599,
+            "accuracy": 0.0033
+          },
+          "愤怒": {
+            "correct": 18,
+            "total": 548,
+            "accuracy": 0.0328
+          }
+        }
+      },
+      "held_out": {
+        "accuracy": 0.1823,
+        "correct": 219,
+        "total": 1201,
+        "per_class_accuracy": {
+          "尴尬": {
+            "correct": 87,
+            "total": 212,
+            "accuracy": 0.4104
+          },
+          "开心": {
+            "correct": 11,
+            "total": 280,
+            "accuracy": 0.0393
+          },
+          "悲伤": {
+            "correct": 111,
+            "total": 273,
+            "accuracy": 0.4066
+          },
+          "惊讶": {
+            "correct": 0,
+            "total": 190,
+            "accuracy": 0.0
+          },
+          "愤怒": {
+            "correct": 10,
+            "total": 246,
+            "accuracy": 0.0407
+          }
+        }
+      }
+    },
+    "clip_zero_shot_en": {
+      "backbone": "ViT-B/32",
+      "prompt_templates": [
+        "a meme showing a {} expression",
+        "a {} meme",
+        "a photo of a {} person",
+        "an image of someone who is {}",
+        "a {} face"
+      ],
+      "label_adjective_map": {
+        "尴尬": "embarrassed",
+        "开心": "happy",
+        "悲伤": "sad",
+        "惊讶": "surprised",
+        "愤怒": "angry"
+      },
+      "prompt_ensemble": true,
+      "val": {
+        "accuracy": 0.5602,
+        "correct": 1428,
+        "total": 2549,
+        "per_class_accuracy": {
+          "尴尬": {
+            "correct": 46,
+            "total": 515,
+            "accuracy": 0.0893
+          },
+          "开心": {
+            "correct": 341,
+            "total": 434,
+            "accuracy": 0.7857
+          },
+          "悲伤": {
+            "correct": 247,
+            "total": 453,
+            "accuracy": 0.5453
+          },
+          "惊讶": {
+            "correct": 330,
+            "total": 599,
+            "accuracy": 0.5509
+          },
+          "愤怒": {
+            "correct": 464,
+            "total": 548,
+            "accuracy": 0.8467
+          }
+        }
+      },
+      "held_out": {
+        "accuracy": 0.5579,
+        "correct": 670,
+        "total": 1201,
+        "per_class_accuracy": {
+          "尴尬": {
+            "correct": 12,
+            "total": 212,
+            "accuracy": 0.0566
+          },
+          "开心": {
+            "correct": 219,
+            "total": 280,
+            "accuracy": 0.7821
+          },
+          "悲伤": {
+            "correct": 139,
+            "total": 273,
+            "accuracy": 0.5092
+          },
+          "惊讶": {
+            "correct": 105,
+            "total": 190,
+            "accuracy": 0.5526
+          },
+          "愤怒": {
+            "correct": 195,
+            "total": 246,
+            "accuracy": 0.7927
+          }
+        }
+      }
+    },
+    "clip_linear_probe": {
+      "note": "冻结 CLIP 图像特征 + sklearn LogisticRegression, 仅图像模态",
+      "classifier": "LogisticRegression(multinomial, C=1.0, lbfgs)",
+      "train_size": 10194,
+      "val": {
+        "accuracy": 0.7344,
+        "correct": 1872,
+        "total": 2549,
+        "per_class_accuracy": {
+          "尴尬": {
+            "correct": 372,
+            "total": 515,
+            "accuracy": 0.7223
+          },
+          "开心": {
+            "correct": 348,
+            "total": 434,
+            "accuracy": 0.8018
+          },
+          "悲伤": {
+            "correct": 320,
+            "total": 453,
+            "accuracy": 0.7064
+          },
+          "惊讶": {
+            "correct": 464,
+            "total": 599,
+            "accuracy": 0.7746
+          },
+          "愤怒": {
+            "correct": 368,
+            "total": 548,
+            "accuracy": 0.6715
+          }
+        }
+      },
+      "held_out": {
+        "accuracy": 0.6944,
+        "correct": 834,
+        "total": 1201,
+        "per_class_accuracy": {
+          "尴尬": {
+            "correct": 132,
+            "total": 212,
+            "accuracy": 0.6226
+          },
+          "开心": {
+            "correct": 244,
+            "total": 280,
+            "accuracy": 0.8714
+          },
+          "悲伤": {
+            "correct": 176,
+            "total": 273,
+            "accuracy": 0.6447
+          },
+          "惊讶": {
+            "correct": 142,
+            "total": 190,
+            "accuracy": 0.7474
+          },
+          "愤怒": {
+            "correct": 140,
+            "total": 246,
+            "accuracy": 0.5691
+          }
+        }
+      }
+    }
+  },
+  "our_method": {
+    "name": "CrossModalMLP (CLIP 图像 + EasyOCR + CLIP 文本 + MLP)",
+    "val": {
+      "accuracy": 0.8529,
+      "source": "eval_confusion.py"
+    },
+    "held_out": {
+      "accuracy": 0.7585,
+      "source": "eval_heldout_test.py"
+    }
+  },
+  "comparison_table": [
+    {
+      "name": "随机基线 (理论)",
+      "val_acc": 0.2,
+      "held_out_acc": 0.2,
+      "gap_pp": 0.0
+    },
+    {
+      "name": "CLIP Zero-shot (中文 prompt)",
+      "val_acc": 0.1781,
+      "held_out_acc": 0.1823,
+      "gap_pp": -0.42
+    },
+    {
+      "name": "CLIP Zero-shot (英文 prompt)",
+      "val_acc": 0.5602,
+      "held_out_acc": 0.5579,
+      "gap_pp": 0.24
+    },
+    {
+      "name": "CLIP Linear Probe (图像only)",
+      "val_acc": 0.7344,
+      "held_out_acc": 0.6944,
+      "gap_pp": 4.0
+    },
+    {
+      "name": "本文跨模态 MLP (图像+OCR文本)",
+      "val_acc": 0.8529,
+      "held_out_acc": 0.7585,
+      "gap_pp": 9.44
+    }
+  ]
+}

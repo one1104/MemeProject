@@ -231,17 +231,17 @@ createApp({
 
     // 静态数据
     const stats = [
-      { val:'80.12%', label:'独立测试集准确率' },
+      { val:'85.29%', label:'验证集准确率 (seed=42)' },
       { val:'20,000', label:'训练图片数量' },
       { val:'5 类',   label:'情感类别' },
       { val:'30 帧',  label:'GIF动效帧数' },
     ]
     const f1data = [
-      { emo:'尴尬', ico:'😅', f1:.89, c:'#86efac' },
-      { emo:'惊讶', ico:'😲', f1:.87, c:'#fb923c' },
-      { emo:'开心', ico:'😄', f1:.85, c:'#fbbf24' },
-      { emo:'愤怒', ico:'🔥', f1:.81, c:'#f87171' },
-      { emo:'悲伤', ico:'😢', f1:.80, c:'#60a5fa' },
+      { emo:'尴尬', ico:'😅', f1:.9009, c:'#86efac' },
+      { emo:'惊讶', ico:'😲', f1:.8727, c:'#fb923c' },
+      { emo:'开心', ico:'😄', f1:.8472, c:'#fbbf24' },
+      { emo:'愤怒', ico:'🔥', f1:.8239, c:'#f87171' },
+      { emo:'悲伤', ico:'😢', f1:.8129, c:'#60a5fa' },
     ]
     const techStack = [
       { l:'数据层', i:'Bing爬虫 · FER2013 · EasyOCR · 数据增强' },

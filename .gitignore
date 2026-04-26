@@ -29,6 +29,16 @@ uploads/
 temp_input.*
 *.log
 
+# 训练/评估日志与明细（含 GBK 乱码 / 体积大，仓库不需要）
+_*_log.txt
+_*_summary.csv
+
+# 错误案例图（60 张 TOP3 可视化，本地分析用）
+error_cases/
+
+# 论文初稿等私人文档
+*.docx
+
 # IDE / 系统
 .vscode/
 .idea/

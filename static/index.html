@@ -20,7 +20,7 @@
     <div class="topbar-r">
       <div class="chip">CLIP ViT-B/32</div>
       <div class="chip">CrossModalMLP</div>
-      <div class="chip">80.12% ACC</div>
+      <div class="chip" title="seed=42 验证集 n=2,549 · 独立 held-out (n=1,201) = 75.85%">85.29% ACC (val)</div>
       <button class="theme-toggle" @click="toggleTheme">
         <span v-if="isDark">☀️</span>
         <span v-else>🌙</span>
@@ -140,7 +140,7 @@
             <div class="hero-body">
               <div class="hero-eyebrow">DETECTED EMOTION</div>
               <div class="hero-name" :style="{color:emotionColor}">{{emotion}}</div>
-              <div class="hero-sub">CLIP ViT-B/32 · CrossModalMLP · ACC 80.12%</div>
+              <div class="hero-sub" title="seed=42 验证集 n=2,549 · 独立 held-out (n=1,201) = 75.85%">CLIP ViT-B/32 · CrossModalMLP · ACC 85.29% (val)</div>
             </div>
             <div class="hero-right">
               <div class="hero-pct" :style="{color:emotionColor}">{{topProb}}%</div>
@@ -253,10 +253,10 @@
             <div style="margin-top:1.2rem;">
               <div class="icard-title">消融实验对比</div>
               <table>
-                <tr><th>模型</th><th>数据量</th><th>准确率</th></tr>
+                <tr><th>模型</th><th>数据集规模</th><th>准确率</th></tr>
                 <tr><td>单模态 MLP（图像）</td><td>3,000</td><td>76.5%</td></tr>
                 <tr><td>跨模态 MLP（图文）</td><td>3,000</td><td>76.3%</td></tr>
-                <tr class="best"><td>跨模态 MLP（图文）★ 5类</td><td>12,743</td><td>80.12%</td></tr>
+                <tr class="best"><td>跨模态 MLP（图文）★ 5类</td><td>12,743</td><td>85.29%</td></tr>
               </table>
             </div>
           </div>

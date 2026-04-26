@@ -18,7 +18,11 @@ y_tensor = torch.LongTensor(y)
 dataset    = TensorDataset(X_img, X_txt, y_tensor)
 train_size = int(0.8 * len(dataset))
 val_size   = len(dataset) - train_size
-train_set, val_set = random_split(dataset, [train_size, val_size])
+# 固定划分 seed，保证评估脚本能复现出同一验证集
+split_generator = torch.Generator().manual_seed(42)
+train_set, val_set = random_split(
+    dataset, [train_size, val_size], generator=split_generator
+)
 
 train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
 val_loader   = DataLoader(val_set,   batch_size=64)

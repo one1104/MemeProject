@@ -1,0 +1,181 @@
+{
+  "generated_at": "2026-04-19 18:12:24",
+  "dataset": "dataset_test (MD5 cleaned held-out)",
+  "n_samples": 1201,
+  "label_names": [
+    "尴尬",
+    "开心",
+    "悲伤",
+    "惊讶",
+    "愤怒"
+  ],
+  "clip_zero_shot": {
+    "backbone": "ViT-B/32",
+    "prompt_templates": [
+      "一张表达{}情绪的表情包",
+      "{}的表情包",
+      "一个看起来{}的人",
+      "表达{}的图片",
+      "显得很{}"
+    ],
+    "prompt_ensemble": true,
+    "accuracy": 0.1823,
+    "correct": 219,
+    "total": 1201,
+    "per_class_accuracy": {
+      "尴尬": {
+        "correct": 87,
+        "total": 212,
+        "accuracy": 0.4104
+      },
+      "开心": {
+        "correct": 11,
+        "total": 280,
+        "accuracy": 0.0393
+      },
+      "悲伤": {
+        "correct": 111,
+        "total": 273,
+        "accuracy": 0.4066
+      },
+      "惊讶": {
+        "correct": 0,
+        "total": 190,
+        "accuracy": 0.0
+      },
+      "愤怒": {
+        "correct": 10,
+        "total": 246,
+        "accuracy": 0.0407
+      }
+    },
+    "val_subset": {
+      "n_samples": 2549,
+      "accuracy": 0.1781,
+      "correct": 454,
+      "total": 2549,
+      "per_class_accuracy": {
+        "尴尬": {
+          "correct": 231,
+          "total": 515,
+          "accuracy": 0.4485
+        },
+        "开心": {
+          "correct": 22,
+          "total": 434,
+          "accuracy": 0.0507
+        },
+        "悲伤": {
+          "correct": 181,
+          "total": 453,
+          "accuracy": 0.3996
+        },
+        "惊讶": {
+          "correct": 2,
+          "total": 599,
+          "accuracy": 0.0033
+        },
+        "愤怒": {
+          "correct": 18,
+          "total": 548,
+          "accuracy": 0.0328
+        }
+      }
+    }
+  },
+  "our_method": {
+    "name": "CrossModalMLP (CLIP 图像 + EasyOCR + CLIP 文本 + MLP)",
+    "accuracy": 0.7585,
+    "source": "eval_heldout_test.py, clean held-out n=1201"
+  },
+  "comparison": {
+    "zero_shot_acc_zh": 0.1823,
+    "zero_shot_acc_en": 0.5579,
+    "our_method_acc": 0.7585,
+    "our_vs_zh_pp": 57.62,
+    "our_vs_en_pp": 20.06,
+    "zh_vs_en_pp": 37.56
+  },
+  "clip_zero_shot_en": {
+    "backbone": "ViT-B/32",
+    "prompt_templates": [
+      "a meme showing a {} expression",
+      "a {} meme",
+      "a photo of a {} person",
+      "an image of someone who is {}",
+      "a {} face"
+    ],
+    "label_adjective_map": {
+      "尴尬": "embarrassed",
+      "开心": "happy",
+      "悲伤": "sad",
+      "惊讶": "surprised",
+      "愤怒": "angry"
+    },
+    "prompt_ensemble": true,
+    "accuracy": 0.5579,
+    "correct": 670,
+    "total": 1201,
+    "per_class_accuracy": {
+      "尴尬": {
+        "correct": 12,
+        "total": 212,
+        "accuracy": 0.0566
+      },
+      "开心": {
+        "correct": 219,
+        "total": 280,
+        "accuracy": 0.7821
+      },
+      "悲伤": {
+        "correct": 139,
+        "total": 273,
+        "accuracy": 0.5092
+      },
+      "惊讶": {
+        "correct": 105,
+        "total": 190,
+        "accuracy": 0.5526
+      },
+      "愤怒": {
+        "correct": 195,
+        "total": 246,
+        "accuracy": 0.7927
+      }
+    },
+    "val_subset": {
+      "n_samples": 2549,
+      "accuracy": 0.5602,
+      "correct": 1428,
+      "total": 2549,
+      "per_class_accuracy": {
+        "尴尬": {
+          "correct": 46,
+          "total": 515,
+          "accuracy": 0.0893
+        },
+        "开心": {
+          "correct": 341,
+          "total": 434,
+          "accuracy": 0.7857
+        },
+        "悲伤": {
+          "correct": 247,
+          "total": 453,
+          "accuracy": 0.5453
+        },
+        "惊讶": {
+          "correct": 330,
+          "total": 599,
+          "accuracy": 0.5509
+        },
+        "愤怒": {
+          "correct": 464,
+          "total": 548,
+          "accuracy": 0.8467
+        }
+      }
+    }
+  },
+  "updated_at": "2026-04-19 18:18:32"
+}
